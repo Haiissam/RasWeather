@@ -48,14 +48,13 @@ private:
     QBarSet *set0;
     QBarSet *set1;
     QBarSet *set2;
-    QGridLayout* gridLayout;
-    QStandardItem *item1 = new QStandardItem;
-    QStandardItem *item2 = new QStandardItem;
-    QStandardItem *item3 = new QStandardItem;
-    QStandardItem *item4 = new QStandardItem;
-    QStandardItem *item5 = new QStandardItem;
-    QStandardItem *item6 = new QStandardItem;
-    QStandardItem *item7 = new QStandardItem;
+    QStandardItem *item1;
+    QStandardItem *item2;
+    QStandardItem *item3;
+    QStandardItem *item4;
+    QStandardItem *item5;
+    QStandardItem *item6;
+    QStandardItem *item7;
 
 
 

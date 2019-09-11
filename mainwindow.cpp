@@ -38,6 +38,14 @@ MainWindow::MainWindow(QWidget *parent) :
     i_indice = new IndiceUV;
     pm_prevision=new Prevision;
 
+    item1 = new QStandardItem;
+    item2 = new QStandardItem;
+    item3 = new QStandardItem;
+    item4 = new QStandardItem;
+    item5 = new QStandardItem;
+    item6 = new QStandardItem;
+    item7 = new QStandardItem;
+
     connect(m_meteo,SIGNAL(received()),this,SLOT(printHashmeteo()));
     connect(i_indice,SIGNAL(received()),this,SLOT(printHashindice()));
     connect(pm_prevision,SIGNAL(received()),this,SLOT(printHashprevision()));
@@ -46,10 +54,14 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(p_pollution,SIGNAL(received()),this,SLOT(AQI()));
     connect(p_pollution,SIGNAL(received()),this,SLOT(Icon()));
 
-    connect(ui->pushButton_close,SIGNAL(clicked()),this,SLOT(close()));
 
+    //Changer le background de la mainwindow
 
-
+    QPixmap bkgnd ("/home/haissam/Pictures/meteo1.jpeg");
+    bkgnd = bkgnd.scaled(this->size(), Qt::IgnoreAspectRatio);
+    QPalette palette;
+    palette.setBrush(QPalette::Background,bkgnd);
+    this->setPalette(palette);
 
 }
 
@@ -61,6 +73,7 @@ MainWindow::~MainWindow()
     delete p_pollution;
     delete i_indice;
     delete pm_prevision;
+
 
 }
 
@@ -94,30 +107,6 @@ void MainWindow::printHashmeteo()                              //création et re
     model->setItem(6, 0, item7);
 
 
-    for (int i=0;i<=6;i++)
-    {
-
-        QStandardItem *m = new QStandardItem;
-        m->setText(hash_meteo.value(QString ("%1").arg(i)).toString());
-        model->setItem(i,1,m);
-
-
-    }
-
-
-    /*Configuration du tableView*/
-
-    ui->tableView->setModel(model);
-    //ui->tableView->resizeColumnsToContents();
-    ui->tableView->horizontalHeader()->hide();
-    ui->tableView->verticalHeader()->hide();
-    ui->tableView->setColumnWidth(0,400);
-    ui->tableView->setColumnWidth(1,200);
-
-
-    //ui->tableView->setDisabled(1);
-    ui->tableView->setFont(QFont("Ubuntu", 16, QFont::Bold));
-    ui->tableView->setEditTriggers(nullptr);                          //Permet de mettre le tableau en readonly
 
 
     QString t = hash_meteo.value("temp").toString();
@@ -183,9 +172,9 @@ void MainWindow::printHashindice()                                 //Affichage d
 
     /* Affichage de la l'image contenant les légendes des indices UV*/
 
-    QPixmap uvprotection;
+    /*QPixmap uvprotection;
     uvprotection.load(":/Icons_meteo/protectionUV.png");
-    ui->label_UVprotection->setPixmap(uvprotection);
+    ui->label_UVprotection->setPixmap(uvprotection);*/
 }
 
 
@@ -274,8 +263,8 @@ void MainWindow::pollutionChart()                                   //Création 
     chartView->setRenderHint(QPainter::Antialiasing);
     chartView->setChart(chart);
 
-    gridLayout = new QGridLayout(ui->widgetPollution);
-    gridLayout->addWidget(chartView);
+    /*gridLayout = new QGridLayout(ui->widgetPollution);
+    gridLayout->addWidget(chartView);*/
 
     chart->setAnimationDuration(2000);
     chart->setAnimationOptions(QChart::AllAnimations);
@@ -297,9 +286,9 @@ void MainWindow::printHashprevision()                          //Affichage des p
 
     QPixmap ic;
     QString icon;
-    double t1,t2,t3,t4,t5,t6,t7,t8;
-    QDateTime dh1,dh2,dh3,dh4,dh5,dh6,dh7,dh8;
-    QString h1,h2,h3,h4,h5,h6,h7,h8;
+    double t1,t2,t3,t4,t5;
+    QDateTime dh1,dh2,dh3,dh4,dh5;
+    QString h1,h2,h3,h4,h5;
 
 
     /*Affichage des icones dans l'onglet prévision*/
@@ -324,7 +313,7 @@ void MainWindow::printHashprevision()                          //Affichage des p
     ic.load(QString(":/Icons_meteo/%1.png").arg(icon));
     ui->label_icon5->setPixmap(ic);
 
-    icon=hash_prevision.value("Icon6").toString();
+    /*icon=hash_prevision.value("Icon6").toString();
     ic.load(QString(":/Icons_meteo/%1.png").arg(icon));
     ui->label_icon6->setPixmap(ic);
 
@@ -334,7 +323,7 @@ void MainWindow::printHashprevision()                          //Affichage des p
 
     icon=hash_prevision.value("Icon8").toString();
     ic.load(QString(":/Icons_meteo/%1.png").arg(icon));
-    ui->label_icon8->setPixmap(ic);
+    ui->label_icon8->setPixmap(ic);*/
 
 
 
@@ -355,14 +344,14 @@ void MainWindow::printHashprevision()                          //Affichage des p
     t5 = hash_prevision.value("Temp5").toDouble();
     ui->label_value5->setText(QString ("%1 °C").arg(t5));
 
-    t6 = hash_prevision.value("Temp6").toDouble();
+    /*t6 = hash_prevision.value("Temp6").toDouble();
     ui->label_value6->setText(QString ("%1 °C").arg(t6));
 
     t7 = hash_prevision.value("Temp7").toDouble();
     ui->label_value7->setText(QString ("%1 °C").arg(t7));
 
     t8 = hash_prevision.value("Temp8").toDouble();
-    ui->label_value8->setText(QString ("%1 °C").arg(t8));
+    ui->label_value8->setText(QString ("%1 °C").arg(t8));*/
 
 
 
@@ -389,7 +378,7 @@ void MainWindow::printHashprevision()                          //Affichage des p
     h5 = dh5.toString("hh:mm");
     ui->label_date5->setText(h5);
 
-    dh6 = hash_prevision.value("Date_heure6").toDateTime();
+    /*dh6 = hash_prevision.value("Date_heure6").toDateTime();
     h6 = dh6.toString("hh:mm");
     ui->label_date6->setText(h6);
 
@@ -399,132 +388,130 @@ void MainWindow::printHashprevision()                          //Affichage des p
 
     dh8 = hash_prevision.value("Date_heure8").toDateTime();
     h8 = dh8.toString("hh:mm");
-    ui->label_date8->setText(h8);
+    ui->label_date8->setText(h8);*/
 
 
-    /*Création du graphique de l'onglet prévision*/
+//    /*Création du graphique de l'onglet prévision*/
 
-    QChart *chart = new QChart();
+//    QChart *chart = new QChart();
 
-    /*Définiton de Line Series pour courbe température*/
+//    /*Définiton de Line Series pour courbe température*/
 
-    QLineSeries *series = new QLineSeries();
+//    QLineSeries *series = new QLineSeries();
 
-    series->append(0, t1);
-    series->append(1, t2);
-    series->append(2, t3);
-    series->append(3, t4);
-    series->append(4, t5);
-    series->append(5, t6);
-    series->append(6, t7);
-    series->append(7, t8);
-
-    /*Récupération précipitation en mm*/
+//    series->append(0, t1);
+//    series->append(1, t2);
+//    series->append(2, t3);
+//    series->append(3, t4);
+//    series->append(4, t5);
 
 
-    double r1, r2, r3, r4, r5, r6, r7, r8;
-    r1 = hash_prevision.value("Rain1").toDouble();
-    r2 = hash_prevision.value("Rain2").toDouble();
-    r3 = hash_prevision.value("Rain3").toDouble();
-    r4 = hash_prevision.value("Rain4").toDouble();
-    r5 = hash_prevision.value("Rain5").toDouble();
-    r6 = hash_prevision.value("Rain6").toDouble();
-    r7 = hash_prevision.value("Rain7").toDouble();
-    r8 = hash_prevision.value("Rain8").toDouble();
-
-    /*Création d'un QBarSet*/
-
-    QBarSet *set4;
-    set4 = new QBarSet(tr("Précipitation"));
-    *set4 << r1 << r2 << r3 << r4 << r5 << r6 << r7 << r8;
-    set4->setColor(QColor(39, 114, 234));
-
-    /*Création d'un QBarSeries*/
-
-    QBarSeries *series1 = new QBarSeries();
-    series1->append(set4);
-    chart->addSeries(series1);
-
-    /*Création de l'axe Y1 (précipitation)*/
-
-    QValueAxis *axisY1 = new QValueAxis();
-
-    /*Définition du max de l'axe Y1*/
-
-    double mymaxp[] = {r1,r2,r3,r4,r5,r6,r7,r8};
-    double *maxp;
-    maxp = std::max_element (mymaxp,mymaxp+8);
-
-    axisY1->setRange(0,*maxp+1);
-    axisY1->setTitleText(tr("Précipitation en mm"));
-    axisY1->setLabelsColor(QColor(39, 114, 234));
-    chart->addAxis(axisY1, Qt::AlignRight);
-    series1->attachAxis(axisY1);
+//    /*Récupération précipitation en mm*/
 
 
-    /*Création de l'axe Y (température)*/
+//    double r1, r2, r3, r4, r5, r6, r7, r8;
+//    r1 = hash_prevision.value("Rain1").toDouble();
+//    r2 = hash_prevision.value("Rain2").toDouble();
+//    r3 = hash_prevision.value("Rain3").toDouble();
+//    r4 = hash_prevision.value("Rain4").toDouble();
+//    r5 = hash_prevision.value("Rain5").toDouble();
+//    r6 = hash_prevision.value("Rain6").toDouble();
+//    r7 = hash_prevision.value("Rain7").toDouble();
+//    r8 = hash_prevision.value("Rain8").toDouble();
 
-    QValueAxis *axisY = new QValueAxis();
+//    /*Création d'un QBarSet*/
 
-    /*Définition du max de l'axe Y*/
+//    QBarSet *set4;
+//    set4 = new QBarSet(tr("Précipitation"));
+//    *set4 << r1 << r2 << r3 << r4 << r5 << r6 << r7 << r8;
+//    set4->setColor(QColor(39, 114, 234));
 
-    double mymax[] = {t1,t2,t3,t4,t5,t6,t7,t8};
-    double *max;
-    max = std::max_element (mymax,mymax+8);
-    int rmax= int (*max);
+//    /*Création d'un QBarSeries*/
 
-    /*Définition du min de l'axe Y*/
+//    QBarSeries *series1 = new QBarSeries();
+//    series1->append(set4);
+//    chart->addSeries(series1);
 
-    double mymin[] = {t1,t2,t3,t4,t5,t6,t7,t8};
-    double *min;
-    min = std::min_element (mymin,mymin+8);
-    int rmin= int (*min);
+//    /*Création de l'axe Y1 (précipitation)*/
 
-    chart->addAxis(axisY, Qt::AlignLeft);
-    chart->addSeries(series);
+//    QValueAxis *axisY1 = new QValueAxis();
 
-    series->attachAxis(axisY);
-    series->setColor(QColor(234, 114, 39));
+//    /*Définition du max de l'axe Y1*/
 
-    axisY->setRange(rmin-5,rmax+5);
-    axisY->setTitleText(tr("Température en °C"));
-    axisY->setLabelsColor(Qt::blue);
-    axisY->setLabelsColor(QColor(234, 114, 39));
-    axisY->setLabelFormat("%.1f");
+//    double mymaxp[] = {r1,r2,r3,r4,r5,r6,r7,r8};
+//    double *maxp;
+//    maxp = std::max_element (mymaxp,mymaxp+8);
 
-
-    /*Création de l'axe X (heure)*/
-
-
-    QBarCategoryAxis *axisX = new QBarCategoryAxis();
-    QStringList categories;
-    categories << h1 << h2 << h3 << h4 << h5 << h6 << h7 << h8;
-    axisX->append(categories);
-    axisX->setTitleText(tr("Heure"));
-    //axisX->setLabelsColor(255);
-    chart->addAxis(axisX, Qt::AlignBottom);
-    series->attachAxis(axisX);
+//    axisY1->setRange(0,*maxp+1);
+//    axisY1->setTitleText(tr("Précipitation en mm"));
+//    axisY1->setLabelsColor(QColor(39, 114, 234));
+//    chart->addAxis(axisY1, Qt::AlignRight);
+//    series1->attachAxis(axisY1);
 
 
-    QChartView *chartView = new QChartView(chart);
-    chartView->setRenderHint(QPainter::Antialiasing);
+//    /*Création de l'axe Y (température)*/
+
+//    QValueAxis *axisY = new QValueAxis();
+
+//    /*Définition du max de l'axe Y*/
+
+//    double mymax[] = {t1,t2,t3,t4,t5};
+//    double *max;
+//    max = std::max_element (mymax,mymax+5);
+//    int rmax= int (*max);
+
+//    /*Définition du min de l'axe Y*/
+
+//    double mymin[] = {t1,t2,t3,t4,t5};
+//    double *min;
+//    min = std::min_element (mymin,mymin+5);
+//    int rmin= int (*min);
+
+//    chart->addAxis(axisY, Qt::AlignLeft);
+//    chart->addSeries(series);
+
+//    series->attachAxis(axisY);
+//    series->setColor(QColor(234, 114, 39));
+
+//    axisY->setRange(rmin-5,rmax+5);
+//    axisY->setTitleText(tr("Température en °C"));
+//    axisY->setLabelsColor(Qt::blue);
+//    axisY->setLabelsColor(QColor(234, 114, 39));
+//    axisY->setLabelFormat("%.1f");
 
 
-    /*Gridlayout: grille contenant des cases où l'on peux y ajoute des widgets en entrant le numéro de ligne et de colonne*/
-    gridLayout = new QGridLayout(ui->widgetPrevision); //Ici on positionne la gridlayout sur la widgetPrevision
-    gridLayout->addWidget(chartView);                  //On y ajoute la chartview
+//    /*Création de l'axe X (heure)*/
 
 
-    /*Option du graphique*/
-    chart->setAnimationDuration(2000);
-    chart->setAnimationOptions(QChart::AllAnimations);
-    chart->legend()->setVisible(0);
-    chart->setTitle(tr("Prévision météo pour les prochaines 24h"));
+//    QBarCategoryAxis *axisX = new QBarCategoryAxis();
+//    QStringList categories;
+//    categories << h1 << h2 << h3 << h4 << h5;
+//    axisX->append(categories);
+//    axisX->setTitleText(tr("Heure"));
+//    //axisX->setLabelsColor(255);
+//    chart->addAxis(axisX, Qt::AlignBottom);
+//    series->attachAxis(axisX);
 
-    QFont font;
-    font.setPixelSize(20);
-    font.setBold(1);
-    chart->setTitleFont(font);
+
+//    QChartView *chartView = new QChartView(chart);
+//    chartView->setRenderHint(QPainter::Antialiasing);
+
+
+//    /*Gridlayout: grille contenant des cases où l'on peux y ajoute des widgets en entrant le numéro de ligne et de colonne*/
+//    gridLayout = new QGridLayout(ui->widgetPrevision); //Ici on positionne la gridlayout sur la widgetPrevision
+//    gridLayout->addWidget(chartView);                  //On y ajoute la chartview
+
+
+//    /*Option du graphique*/
+//    chart->setAnimationDuration(2000);
+//    chart->setAnimationOptions(QChart::AllAnimations);
+//    chart->legend()->setVisible(0);
+//    chart->setTitle(tr("Prévision météo pour les prochaines 24h"));
+
+//    QFont font;
+//    font.setPixelSize(20);
+//    font.setBold(1);
+//    chart->setTitleFont(font);
 
 
 
@@ -624,34 +611,8 @@ void MainWindow::setvignette()                                          //Affich
     v6.load(":/Icons_meteo/vignette6.png");
 
 
-    if (jours != "sam" || jours != "dim")
-    {
-        if (heures >="08" && heures <="20")
-
-        {
-
-            ui->label_vignette1->setPixmap(v1);
-            ui->label_vignette2->setPixmap(v2);
-            ui->label_vignette3->setPixmap(v3);
-            ui->label_vignette4->setPixmap(v4);
-            ui->label_vignette5->setPixmap(v5);
-
-        }
-
-        else
-        {
-
-            ui->label_vignette1->setPixmap(v1);
-            ui->label_vignette2->setPixmap(v2);
-            ui->label_vignette3->setPixmap(v3);
-            ui->label_vignette4->setPixmap(v4);
-            ui->label_vignette5->setPixmap(v5);
-            ui->label_vignette6->setPixmap(v6);
 
 
-        }
-
-    }
 
 }
 
