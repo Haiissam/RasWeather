@@ -1,26 +1,12 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-
 #include "meteo.h"
 #include "prevision.h"
 #include "pollution.h"
 #include "indiceuv.h"
 
-#include <QDebug>
-#include <QTableWidgetItem>
-#include <QChart>
-#include <QBarCategoryAxis>
-#include <QValueAxis>
-#include <QChartView>
-#include <QBarSeries>
-#include <QList>
-#include <QLineSeries>
-#include <QDebug>
 #include <QFont>
 #include <QTimer>
-#include <QChart>
-#include <QBarSet>
-#include <QtCharts>
 #include <QStandardItem>
 #include <QPixmap>
 #include <QObject>
@@ -33,110 +19,76 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    m_meteo = new meteo;
-    p_pollution = new Pollution;
-    i_indice = new IndiceUV;
-    pm_prevision=new Prevision;
+    m_meteo     = new meteo();
+    m_pollution = new Pollution();
+    m_indice    = new IndiceUV();
+    m_prevision = new Prevision();
 
-    item1 = new QStandardItem;
-    item2 = new QStandardItem;
-    item3 = new QStandardItem;
-    item4 = new QStandardItem;
-    item5 = new QStandardItem;
-    item6 = new QStandardItem;
-    item7 = new QStandardItem;
+    item1 = new QStandardItem();
+    item2 = new QStandardItem();
+    item3 = new QStandardItem();
+    item4 = new QStandardItem();
+    item5 = new QStandardItem();
+    item6 = new QStandardItem();
+    item7 = new QStandardItem();
 
-    connect(m_meteo,SIGNAL(received()),this,SLOT(printHashmeteo()));
-    connect(i_indice,SIGNAL(received()),this,SLOT(printHashindice()));
-    connect(pm_prevision,SIGNAL(received()),this,SLOT(printHashprevision()));
-    connect(p_pollution,SIGNAL(received()),this,SLOT(printHashpollution()));
-    connect(p_pollution,SIGNAL(received()),this,SLOT(pollutionChart()));
-    connect(p_pollution,SIGNAL(received()),this,SLOT(AQI()));
-    connect(p_pollution,SIGNAL(received()),this,SLOT(Icon()));
-
+    connect(m_meteo,    SIGNAL(received()),this,SLOT(printHashmeteo()));
+    connect(m_indice,   SIGNAL(received()),this,SLOT(printHashindice()));
+    connect(m_prevision,SIGNAL(received()),this,SLOT(printHashprevision()));
+    connect(m_pollution,SIGNAL(received()),this,SLOT(AQI()));
+    connect(m_pollution,SIGNAL(received()),this,SLOT(Icon()));
 
     //Changer le background de la mainwindow
 
-    QPixmap bkgnd ("/home/haissam/Pictures/meteo1.jpeg");
+    /*QPixmap bkgnd ("/home/haissam/Pictures/meteo1.jpeg");
     bkgnd = bkgnd.scaled(this->size(), Qt::IgnoreAspectRatio);
     QPalette palette;
     palette.setBrush(QPalette::Background,bkgnd);
-    this->setPalette(palette);
+    this->setPalette(palette);*/
 
 }
 
 MainWindow::~MainWindow()
 {
-
     delete ui;
     delete m_meteo;
-    delete p_pollution;
-    delete i_indice;
-    delete pm_prevision;
+    delete m_pollution;
+    delete m_indice;
+    delete m_prevision;
 
-
+    delete item1;
+    delete item2;
+    delete item3;
+    delete item4;
+    delete item5;
+    delete item6;
+    delete item7;
 }
-
-
 
 void MainWindow::printHashmeteo()                              //création et remplissage du tableWidget xontenant les informations sur la météo du jours
 {
-
     QHash <QString, QVariant>hash_meteo;
-    hash_meteo=m_meteo->getHash();
-
-
-    /*Remplissage du QTableView avec les données*/
-
-
-    QStandardItemModel *model=new QStandardItemModel(7,2,this);
-
-    item1->setData(tr("Température max (°C)"),0);
-    model->setItem(0, 0, item1);
-    item2->setData(tr("Température min (°C)"),0);
-    model->setItem(1, 0, item2);
-    item3->setData(tr("Ciel "),0);
-    model->setItem(2, 0, item3);
-    item4->setData(tr("Humidité (%)"),0);
-    model->setItem(3, 0, item4);
-    item5->setData(tr("Vitesse du vent (km/h)"),0);
-    model->setItem(4, 0, item5);
-    item6->setData(tr("Direction du vent (°)"),0);
-    model->setItem(5, 0, item6);
-    item7->setData(tr("Pression (hPa)"),0);
-    model->setItem(6, 0, item7);
-
-
-
+    hash_meteo = m_meteo->getHash();
 
     QString t = hash_meteo.value("temp").toString();
     ui->labelTemp->setText(QString ("%1 °C").arg(t));
     ui->labelCiel->setText(hash_meteo.value("main").toString());
     ui->labelDate->setText(QDateTime::currentDateTime().toString(("ddd d MMMM  hh:mm ")));
-
-
-
 }
 
-
-
-void MainWindow::printHashindice()                                 //Affichage de l'indice UV et de l'icon correspondante
+//Affichage de l'indice UV et de l'icon correspondante
+void MainWindow::printHashindice()
 {
-
-
     QHash <QString, QVariant>indice;
-    indice=i_indice->getHash();
-    int indice_value=indice.value("UV").toInt();
+    indice = m_indice->getHash();
+    int indice_value = indice.value("UV").toInt();
     QString ind=tr("Indice UV ");
-
-
 
     if (indice_value>=0 && indice_value<=2)
     {
         ui->label_DUV->setText(QString ("<font color=\"#0fc133\">%0 %1</font>").arg(tr("Faible: ")).arg(indice_value));
         ui->label_indUV->setText("<font color=\"#0fc133\">UV</font>");
         ui->label_TUV->setText(QString("<font color=\"#0fc133\">%1</font>").arg(ind));
-
     }
 
     else if (indice_value>=3 && indice_value<=5)
@@ -160,138 +112,30 @@ void MainWindow::printHashindice()                                 //Affichage d
         ui->label_TUV->setText(QString("<font color=\"#e00f0f\">%1</font>").arg(ind));
     }
 
-    else {
-
+    else
+    {
         ui->label_DUV->setText(QString ("<font color=\"#c669e5\">%0 %1</font>").arg(tr("Extreme!!!: ")).arg(indice_value));
         ui->label_indUV->setText("<font color=\"#c669e5\">UV</font>");
         ui->label_TUV->setText(QString("<font color=\"#c669e5\">%1</font>").arg(ind));
     }
 
     ui->label_DUV->setFont(QFont("Ubuntu",16,QFont::Bold));
-
-
-    /* Affichage de la l'image contenant les légendes des indices UV*/
-
-    /*QPixmap uvprotection;
-    uvprotection.load(":/Icons_meteo/protectionUV.png");
-    ui->label_UVprotection->setPixmap(uvprotection);*/
 }
 
-
-QHash <QString, QVariant> MainWindow::printHashpollution()          //récupération des données pollution
-{
-
-    QHash <QString, QVariant>hash_pollution;
-    hash_pollution=p_pollution->getHash();
-    return hash_pollution;
-
-}
-
-void MainWindow::pollutionChart()                                   //Création et remplissage du graphique "Pollution par polluants"
-{
-
-
-    /* Ajout des titres des sets*/
-
-    set0 = new QBarSet(tr("Taux Actuel"));
-    set1 = new QBarSet(tr("Objectifs de Qualité"));
-    set2 = new QBarSet(tr("Valeurs Limites"));
-
-    /*Récupération des taux de pollutions grace à la fonction prinHashpollution */
-
-    QHash <QString, QVariant> pol=printHashpollution();
-
-    int p1,p2,p3,p4,p5,p6;
-
-    p1 = pol.value("PM25").toInt();
-    p2 = pol.value("PM10").toInt();
-    p3 = pol.value("O3").toInt();
-    p4 = pol.value("NO2").toInt();
-    p5 = (pol.value("CO").toInt())/100;
-    p6 = pol.value("SO2").toInt();
-
-
-    *set0 << p1 << p2 << p3 << p4 << p5 << p6;                      //Taux actuels récupérer par l'API pollution
-    *set1 << 10 << 30 << 120 << 40 << 10000/100 << 50;                                                                                                                                                        //Normes de ces polluants
-    *set2 << 25 << 50 << 240 << 200<< 10000/100 << 125 ;
-
-
-    QBarSeries *series = new QBarSeries();
-    series->append(set0);
-    series->append(set1);
-    series->append(set2);
-
-    QChart *chart = new QChart();
-    chart->addSeries(series);
-    chart->setTitle(tr("Pollution par polluant"));
-    chart->setAnimationOptions(QChart::SeriesAnimations);
-
-
-    QStringList categories;
-    categories << "PM25" << "PM10" << "O3" << "NO2" << "CO" << "SO2";
-
-    /* Définiton du taux max*/
-
-    QValueAxis *axisY = new QValueAxis();
-
-    int mymax[] = {p1,p2,p3,p4,p5,p6};
-    int *max;
-    max = std::max_element (mymax,mymax+6);
-
-    if (*max <= 240)
-    {
-        axisY->setRange(0,240+10);                       //240 correspond au maximum des valeurs limites des polluants.
-    }
-
-    else {
-        axisY->setRange(0,*max+10);
-    }
-
-    axisY->setTitleText(tr("Concentration (µg/m³)"));
-    chart->addAxis(axisY, Qt::AlignLeft);
-    series->attachAxis(axisY);
-
-    QBarCategoryAxis *axisX = new QBarCategoryAxis();
-    axisX->append(categories);
-    chart->addAxis(axisX, Qt::AlignBottom);
-    series->attachAxis(axisX);
-
-    chart->legend()->setVisible(true);
-    chart->legend()->setAlignment(Qt::AlignBottom);
-
-    QChartView *chartView = new QChartView();
-    chartView->setRenderHint(QPainter::Antialiasing);
-    chartView->setChart(chart);
-
-    /*gridLayout = new QGridLayout(ui->widgetPollution);
-    gridLayout->addWidget(chartView);*/
-
-    chart->setAnimationDuration(2000);
-    chart->setAnimationOptions(QChart::AllAnimations);
-
-    QFont font;
-    font.setPixelSize(20);
-    font.setBold(1);
-    chart->setTitleFont(font);
-
-}
-
-
-void MainWindow::printHashprevision()                          //Affichage des prévisions pour les prochaines 24h (par intervalles de 3h), onglet prévision
+//Affichage des prévisions pour les prochaines 24h (par intervalles de 3h), onglet prévision
+void MainWindow::printHashprevision()
 {
 
     QHash <QString, QVariant>hash_prevision;
-    hash_prevision=pm_prevision->getHash();
-
+    hash_prevision = m_prevision->getHash();
 
     QPixmap ic;
     QString icon;
     double t1,t2,t3,t4,t5;
-    QDateTime dh1,dh2,dh3,dh4,dh5;
-    QString h1,h2,h3,h4,h5;
+    QDateTime dh1,dh2,dh3,dh4,dh5,dh6;
+    QString h1,h2,h3,h4,h5,h6;
 
-
-    /*Affichage des icones dans l'onglet prévision*/
+    /*Affichage des icones météo*/
 
     icon=hash_prevision.value("Icon1").toString();
     ic.load(QString(":/Icons_meteo/%1.png").arg(icon));
@@ -313,20 +157,6 @@ void MainWindow::printHashprevision()                          //Affichage des p
     ic.load(QString(":/Icons_meteo/%1.png").arg(icon));
     ui->label_icon5->setPixmap(ic);
 
-    /*icon=hash_prevision.value("Icon6").toString();
-    ic.load(QString(":/Icons_meteo/%1.png").arg(icon));
-    ui->label_icon6->setPixmap(ic);
-
-    icon=hash_prevision.value("Icon7").toString();
-    ic.load(QString(":/Icons_meteo/%1.png").arg(icon));
-    ui->label_icon7->setPixmap(ic);
-
-    icon=hash_prevision.value("Icon8").toString();
-    ic.load(QString(":/Icons_meteo/%1.png").arg(icon));
-    ui->label_icon8->setPixmap(ic);*/
-
-
-
     /*Affichage des températures dans l'onglet prévision*/
 
     t1 = hash_prevision.value("Temp1").toDouble();
@@ -344,20 +174,7 @@ void MainWindow::printHashprevision()                          //Affichage des p
     t5 = hash_prevision.value("Temp5").toDouble();
     ui->label_value5->setText(QString ("%1 °C").arg(t5));
 
-    /*t6 = hash_prevision.value("Temp6").toDouble();
-    ui->label_value6->setText(QString ("%1 °C").arg(t6));
-
-    t7 = hash_prevision.value("Temp7").toDouble();
-    ui->label_value7->setText(QString ("%1 °C").arg(t7));
-
-    t8 = hash_prevision.value("Temp8").toDouble();
-    ui->label_value8->setText(QString ("%1 °C").arg(t8));*/
-
-
-
-    /*Affichage des dates dans l'onglet prévision*/
-
-
+    /*Affichage des dates météo*/
     dh1 = hash_prevision.value("Date_heure1").toDateTime();
     h1 = dh1.toString("hh:mm");
     ui->label_date1->setText(h1);
@@ -377,154 +194,15 @@ void MainWindow::printHashprevision()                          //Affichage des p
     dh5 = hash_prevision.value("Date_heure5").toDateTime();
     h5 = dh5.toString("hh:mm");
     ui->label_date5->setText(h5);
-
-    /*dh6 = hash_prevision.value("Date_heure6").toDateTime();
-    h6 = dh6.toString("hh:mm");
-    ui->label_date6->setText(h6);
-
-    dh7 = hash_prevision.value("Date_heure7").toDateTime();
-    h7 = dh7.toString("hh:mm");
-    ui->label_date7->setText(h7);
-
-    dh8 = hash_prevision.value("Date_heure8").toDateTime();
-    h8 = dh8.toString("hh:mm");
-    ui->label_date8->setText(h8);*/
-
-
-//    /*Création du graphique de l'onglet prévision*/
-
-//    QChart *chart = new QChart();
-
-//    /*Définiton de Line Series pour courbe température*/
-
-//    QLineSeries *series = new QLineSeries();
-
-//    series->append(0, t1);
-//    series->append(1, t2);
-//    series->append(2, t3);
-//    series->append(3, t4);
-//    series->append(4, t5);
-
-
-//    /*Récupération précipitation en mm*/
-
-
-//    double r1, r2, r3, r4, r5, r6, r7, r8;
-//    r1 = hash_prevision.value("Rain1").toDouble();
-//    r2 = hash_prevision.value("Rain2").toDouble();
-//    r3 = hash_prevision.value("Rain3").toDouble();
-//    r4 = hash_prevision.value("Rain4").toDouble();
-//    r5 = hash_prevision.value("Rain5").toDouble();
-//    r6 = hash_prevision.value("Rain6").toDouble();
-//    r7 = hash_prevision.value("Rain7").toDouble();
-//    r8 = hash_prevision.value("Rain8").toDouble();
-
-//    /*Création d'un QBarSet*/
-
-//    QBarSet *set4;
-//    set4 = new QBarSet(tr("Précipitation"));
-//    *set4 << r1 << r2 << r3 << r4 << r5 << r6 << r7 << r8;
-//    set4->setColor(QColor(39, 114, 234));
-
-//    /*Création d'un QBarSeries*/
-
-//    QBarSeries *series1 = new QBarSeries();
-//    series1->append(set4);
-//    chart->addSeries(series1);
-
-//    /*Création de l'axe Y1 (précipitation)*/
-
-//    QValueAxis *axisY1 = new QValueAxis();
-
-//    /*Définition du max de l'axe Y1*/
-
-//    double mymaxp[] = {r1,r2,r3,r4,r5,r6,r7,r8};
-//    double *maxp;
-//    maxp = std::max_element (mymaxp,mymaxp+8);
-
-//    axisY1->setRange(0,*maxp+1);
-//    axisY1->setTitleText(tr("Précipitation en mm"));
-//    axisY1->setLabelsColor(QColor(39, 114, 234));
-//    chart->addAxis(axisY1, Qt::AlignRight);
-//    series1->attachAxis(axisY1);
-
-
-//    /*Création de l'axe Y (température)*/
-
-//    QValueAxis *axisY = new QValueAxis();
-
-//    /*Définition du max de l'axe Y*/
-
-//    double mymax[] = {t1,t2,t3,t4,t5};
-//    double *max;
-//    max = std::max_element (mymax,mymax+5);
-//    int rmax= int (*max);
-
-//    /*Définition du min de l'axe Y*/
-
-//    double mymin[] = {t1,t2,t3,t4,t5};
-//    double *min;
-//    min = std::min_element (mymin,mymin+5);
-//    int rmin= int (*min);
-
-//    chart->addAxis(axisY, Qt::AlignLeft);
-//    chart->addSeries(series);
-
-//    series->attachAxis(axisY);
-//    series->setColor(QColor(234, 114, 39));
-
-//    axisY->setRange(rmin-5,rmax+5);
-//    axisY->setTitleText(tr("Température en °C"));
-//    axisY->setLabelsColor(Qt::blue);
-//    axisY->setLabelsColor(QColor(234, 114, 39));
-//    axisY->setLabelFormat("%.1f");
-
-
-//    /*Création de l'axe X (heure)*/
-
-
-//    QBarCategoryAxis *axisX = new QBarCategoryAxis();
-//    QStringList categories;
-//    categories << h1 << h2 << h3 << h4 << h5;
-//    axisX->append(categories);
-//    axisX->setTitleText(tr("Heure"));
-//    //axisX->setLabelsColor(255);
-//    chart->addAxis(axisX, Qt::AlignBottom);
-//    series->attachAxis(axisX);
-
-
-//    QChartView *chartView = new QChartView(chart);
-//    chartView->setRenderHint(QPainter::Antialiasing);
-
-
-//    /*Gridlayout: grille contenant des cases où l'on peux y ajoute des widgets en entrant le numéro de ligne et de colonne*/
-//    gridLayout = new QGridLayout(ui->widgetPrevision); //Ici on positionne la gridlayout sur la widgetPrevision
-//    gridLayout->addWidget(chartView);                  //On y ajoute la chartview
-
-
-//    /*Option du graphique*/
-//    chart->setAnimationDuration(2000);
-//    chart->setAnimationOptions(QChart::AllAnimations);
-//    chart->legend()->setVisible(0);
-//    chart->setTitle(tr("Prévision météo pour les prochaines 24h"));
-
-//    QFont font;
-//    font.setPixelSize(20);
-//    font.setBold(1);
-//    chart->setTitleFont(font);
-
-
-
 }
 
-
-void MainWindow::AQI()                                          //affichage de l'AQI et l'icone correspondante
+//affichage de l'AQI et l'icone correspondante
+void MainWindow::AQI()
 {
-
     QPixmap fondPlan;
-    QHash <QString, QVariant> aqi=printHashpollution();
-    int aqi_value= aqi.value("AQI").toInt();
-    QString aq=tr("Indice Qualité Air ");
+    QHash <QString, QVariant> aqi = m_pollution->getHash();
+    int aqi_value = aqi.value("AQI").toInt();
+    QString aq =  tr("Indice Qualité Air ");
 
     if (aqi_value>=0 && aqi_value<=50)
     {
@@ -572,49 +250,21 @@ void MainWindow::AQI()                                          //affichage de l
         fondPlan.load(":/Icons_meteo/aqi_h.png");
         ui->label_IAQI->setPixmap(fondPlan);
         ui->label->setText(QString ("<font color=\"#c11b1b\">%1</font>").arg(aq));
-
     }
-
-    setvignette();         //affichage des vignettes Crit'Air
-
 }
 
-
-void MainWindow::Icon()                                        //affichage de l'icone meteo dans l'onglet Météo
+//affichage de l'icone meteo dans l'onglet Météo
+void MainWindow::Icon()
 {
-
     QHash <QString, QVariant>hash_meteo;
-    hash_meteo=m_meteo->getHash();
-    QString icon=hash_meteo.value("icon").toString();
+    hash_meteo = m_meteo->getHash();
+    QString icon = hash_meteo.value("icon").toString();
     QPixmap ic;
 
     ic.load(QString(":/Icons_meteo/%1.png").arg(icon));
     ui->labelIcon->setPixmap(ic);
-
 }
 
-
-void MainWindow::setvignette()                                          //Affichage des vignettes Crit'Air autorisées à la circulation
-{
-
-    QString jours = (QDate::currentDate().toString("ddd"));
-    QString heures = (QTime::currentTime().toString("hh"));
-
-
-    QPixmap v1 ,v2,v3,v4,v5,v6;
-
-    v1.load(":/Icons_meteo/vignette1.png");
-    v2.load(":/Icons_meteo/vignette2.png");
-    v3.load(":/Icons_meteo/vignette3.png");
-    v4.load(":/Icons_meteo/vignette4.png");
-    v5.load(":/Icons_meteo/vignette5.png");
-    v6.load(":/Icons_meteo/vignette6.png");
-
-
-
-
-
-}
 
 
 

@@ -6,8 +6,9 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <apijson.h>
 
-class Prevision:public QObject
+class Prevision:public APIJson
 {
 
     Q_OBJECT
@@ -15,24 +16,8 @@ class Prevision:public QObject
 public:
     Prevision();
 
-    void setRequest();
     QHash <QString, QVariant> readJson();
-    QHash <QString, QVariant> getHash() { return pm_hash;}
 
-
-private:
-    QNetworkReply *reply;
-    QNetworkAccessManager *manager;
-    QNetworkRequest request;
-    QByteArray req;
-    QHash <QString, QVariant> pm_hash;
-
-
-public slots:
-   void replyFinished();
-
-signals:
-   void received();
 };
 
 #endif // PREVISION_H

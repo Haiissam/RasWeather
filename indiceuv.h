@@ -6,30 +6,17 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <apijson.h>
 
 
-class IndiceUV:public QObject
+class IndiceUV:public APIJson
 {
     Q_OBJECT
 public:
     IndiceUV();
-    void setRequest();
+
     QHash <QString, QVariant> readJson();
-    QHash <QString, QVariant> getHash() {return i_hash;}
 
-private:
-    QNetworkReply *reply;
-    QNetworkAccessManager *manager;
-    QNetworkRequest request;
-    QByteArray req;
-    QHash <QString, QVariant> i_hash;
-
-
-public slots:
-   void replyFinished();
-
-signals:
-   void received();
 };
 
 #endif // INDICEUV_H

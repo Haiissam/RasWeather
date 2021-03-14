@@ -6,31 +6,16 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <apijson.h>
 
-class Pollution:public QObject
+class Pollution:public APIJson
 {
 
     Q_OBJECT
 
 public:   
     Pollution();
-    void setRequest();
-    QHash <QString, QVariant> getHash() { return p_hash;}
     QVariantHash readJson();
-
-private:
-    QNetworkReply *reply;
-    QNetworkAccessManager *manager;
-    QNetworkRequest request;
-    QByteArray req;
-    QHash <QString, QVariant> p_hash;
-
-public slots:
-    void replyFinished();
-
-signals:
-    void received();
-
 
 };
 

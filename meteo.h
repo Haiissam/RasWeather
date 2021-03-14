@@ -6,32 +6,16 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <apijson.h>
 
 
-class meteo:public QObject
+class meteo:public APIJson
 {
      Q_OBJECT
 
 public:
     meteo();
     QVariantHash readJson();
-    void setRequest();
-    QHash <QString, QVariant> getHash() { return m_hash;}
-
-private:
-    QNetworkReply *reply;
-    QNetworkAccessManager *manager;
-    QNetworkRequest request;
-    QByteArray req;
-    QVariantHash tableau;
-    QHash <QString, QVariant> m_hash;
-
-
-public slots:
-   void replyFinished();
-
-signals:
-   void received();
 
 };
 

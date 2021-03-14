@@ -1,4 +1,6 @@
 #include "prevision.h"
+#include "apijson.h"
+#include "define_url.h"
 
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -12,40 +14,23 @@
 
 Prevision::Prevision()
 {
-    setRequest();
-    connect(manager,&QNetworkAccessManager::finished,this,&Prevision::replyFinished);
-
+    setRequest(URL_PREVISION);
+    connect(m_manager,&QNetworkAccessManager::finished,this,&Prevision::replyFinished);
 }
-
-
-void Prevision::setRequest()
-{
-    manager = new QNetworkAccessManager(this);
-    QUrl url("http://api.openweathermap.org/data/2.5/forecast?q=Paris&APPID=5d9a9473c107d2bf83aea4040bfea135&units=metric&lang=fr");
-    request.setUrl(url);
-    reply = manager->get(request);
-}
-
-
 
 QHash<QString, QVariant> Prevision::readJson()
 
 {
-
-
     QHash <QString, QVariant> hash;
 
     /*Récupérer les valeurs de coord (lat el lon)*/
-
-    QJsonDocument d = QJsonDocument::fromJson(req);
+    QJsonDocument d = QJsonDocument::fromJson(m_req);
     QJsonObject obj = d.object();
 
     QJsonArray tableauJSON;
     tableauJSON = obj["list"].toArray();
 
-
     for (int i = 0; i < tableauJSON.size(); i++) {
-
 
         /*Récupération des info dans l'objet main*/
 
@@ -72,23 +57,9 @@ QHash<QString, QVariant> Prevision::readJson()
         QJsonValue val1 = obj2.value(QString("rain"));
         QJsonObject item1 = val1.toObject();
         hash[QString ("Rain%1").arg(i)]=item1.value("3h").toDouble();
-
-
     }
 
-
     return hash;
-
-}
-
-
-void Prevision::replyFinished()
-
-{
-    req=reply->readAll();
-    pm_hash=readJson();
-    emit received();
-
 }
 
 

@@ -1,4 +1,6 @@
 #include "meteo.h"
+#include "apijson.h"
+#include "define_url.h"
 
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -9,27 +11,20 @@
 #include <QJsonValue>
 #include <QVariantHash>
 
-
-
-
 meteo::meteo()
 {
-
-    setRequest();
-    connect(manager,&QNetworkAccessManager::finished,this,&meteo::replyFinished);
-
+    setRequest(URL_METEO);
+    connect(m_manager,&QNetworkAccessManager::finished,this,&meteo::replyFinished);
 }
 
 
 QVariantHash meteo::readJson()
 {
-
-
     QHash <QString, QVariant> hash;
 
     /*Récupérer les valeurs de coord (lat el lon)*/
 
-    QJsonDocument d = QJsonDocument::fromJson(req);
+    QJsonDocument d = QJsonDocument::fromJson(m_req);
     QJsonObject obj = d.object();
     QJsonValue val = obj.value(QString("coord"));
     QJsonObject item = val.toObject();
@@ -46,7 +41,6 @@ QVariantHash meteo::readJson()
     hash["6"] = item1.value("pressure").toDouble();
     hash["1"] = item1.value("temp_min").toDouble();
     hash["0"] = item1.value("temp_max").toDouble();
-
 
     /*Récupérer les valeurs de wind (vitesse et direction du vent)*/
     QJsonValue val2 = obj.value(QString("wind"));
@@ -69,29 +63,7 @@ QVariantHash meteo::readJson()
     hash["2"] = obj2.value("description").toString();
     hash["icon"] = obj2.value("icon").toString();
 
-
     return hash;
-
-
-}
-
-void meteo::setRequest()
-{
-
-    manager = new QNetworkAccessManager(this);
-    QUrl url("http://api.openweathermap.org/data/2.5/weather?q=Paris&APPID=5d9a9473c107d2bf83aea4040bfea135&units=metric&lang=fr");
-    request.setUrl(url);
-    reply = manager->get(request);
-
-}
-
-
-void meteo::replyFinished()
-{
-    req=reply->readAll();
-    m_hash=readJson();
-    emit received();
-
 }
 
 

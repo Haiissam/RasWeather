@@ -30,6 +30,7 @@ CONFIG += c++11
 
 
 SOURCES += \
+        apijson.cpp \
         indiceuv.cpp \
         main.cpp \
         mainwindow.cpp \
@@ -38,6 +39,8 @@ SOURCES += \
         prevision.cpp
 
 HEADERS += \
+        apijson.h \
+        define_url.h \
         indiceuv.h \
         mainwindow.h \
         meteo.h \
